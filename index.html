@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Metodo FELICE</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#080810;--surface:#0f1020;--surface2:#161828;--border:#1e2240;
+  --accent:#6366f1;--accent2:#818cf8;
+  --green:#4ade80;--yellow:#facc15;--orange:#fb923c;--red:#f87171;
+  --text:#e2e8f0;--muted:#64748b;--subtle:#334155;
+}
+html,body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;max-width:480px;margin:0 auto;}
+body{padding-bottom:72px;}
+
+/* HEADER */
+.header{
+  padding:20px 18px 14px;
+  background:linear-gradient(135deg,#0c0c1e,#1a0a2e);
+  border-bottom:1px solid #1e1b4b;
+  display:flex;align-items:center;gap:12px;
+  position:sticky;top:0;z-index:50;
+}
+.header-icon{font-size:26px;}
+.header-title{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:#e0e7ff;letter-spacing:-0.5px;}
+.header-sub{font-size:10px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-top:1px;}
+
+/* NAV */
+.nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:480px;
+  background:var(--bg);border-top:1px solid #1e1b4b;
+  display:flex;z-index:100;
+}
+.nav-btn{
+  flex:1;padding:9px 4px 11px;background:none;border:none;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  color:var(--muted);transition:color .15s;font-family:'DM Sans',sans-serif;
+}
+.nav-btn.active{color:var(--accent);}
+.nav-btn span:first-child{font-size:17px;}
+.nav-btn span:last-child{font-size:8px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+
+/* TABS */
+.tab{display:none;padding:18px 14px;}
+.tab.active{display:block;}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:14px;}
+.card-sm{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:9px;}
+
+/* SCORE */
+.score-wrap{text-align:center;margin-bottom:26px;}
+.score-ring{
+  display:inline-flex;flex-direction:column;align-items:center;
+  background:linear-gradient(135deg,#1e1b4b,#0f172a);
+  border-radius:22px;padding:22px 44px;
+  transition:border-color .3s,box-shadow .3s;
+}
+.score-num{font-family:'Syne',sans-serif;font-size:62px;font-weight:800;line-height:1;letter-spacing:-3px;}
+.score-label{font-size:13px;font-weight:600;margin-top:4px;}
+.score-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+
+/* SLIDERS */
+.slider-row{margin-bottom:16px;}
+.slider-header{display:flex;justify-content:space-between;margin-bottom:5px;}
+.slider-name{font-size:13px;color:#cbd5e1;}
+.slider-val{font-size:14px;font-weight:700;}
+.slider-track{height:5px;background:var(--surface2);border-radius:99px;position:relative;margin-bottom:-5px;}
+.slider-fill{height:100%;border-radius:99px;transition:width .12s;}
+input[type=range]{width:100%;opacity:0;height:20px;cursor:pointer;position:relative;z-index:1;}
+
+/* ALLENAMENTO */
+.all-grid{display:flex;gap:7px;}
+.all-btn{
+  flex:1;padding:8px 2px;border-radius:9px;border:none;
+  background:var(--surface2);color:var(--muted);
+  font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;
+  font-family:'DM Sans',sans-serif;
+}
+.all-btn.active{background:var(--accent);color:#fff;}
+
+/* RADAR */
+.radar-wrap{margin-bottom:22px;}
+canvas#radarCanvas{display:block;margin:0 auto;}
+
+/* SAVE BTN */
+.save-btn{
+  width:100%;padding:14px;border-radius:14px;border:none;
+  background:linear-gradient(135deg,var(--accent),#7c3aed);
+  color:#fff;font-size:14px;font-weight:700;cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  box-shadow:0 4px 20px #4f46e540;transition:all .3s;
+}
+.save-btn:disabled{background:var(--surface2);color:var(--muted);box-shadow:none;cursor:not-allowed;}
+.save-btn.saved{background:#16a34a;}
+
+/* CHART */
+.bar-row{display:flex;gap:6px;align-items:flex-end;height:90px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.bar-val{font-size:8px;font-weight:700;}
+.bar-body{width:100%;border-radius:4px 4px 0 0;}
+.bar-date{font-size:7px;color:var(--muted);}
+
+/* DIARIO LIST */
+.diary-row{
+  background:var(--surface);border:1px solid var(--border);border-radius:13px;
+  padding:13px 14px;margin-bottom:9px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.diary-date{font-size:13px;color:#94a3b8;}
+.diary-params{font-size:11px;color:var(--muted);margin-top:3px;}
+.diary-score{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;}
+.diary-badge{font-size:9px;font-weight:600;text-align:right;}
+
+/* KPI GRID */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;}
+.kpi-emoji{font-size:18px;}
+.kpi-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-top:5px;}
+.kpi-lbl{font-size:10px;color:var(--muted);margin-top:2px;}
+
+/* FINANZE */
+.saldo-card{
+  background:linear-gradient(135deg,#064e3b,#022c22);
+  border:1px solid #065f46;border-radius:16px;padding:18px;margin-bottom:16px;
+}
+.saldo-lbl{font-size:11px;color:#6ee7b7;}
+.saldo-val{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:var(--green);margin-top:2px;}
+.saldo-sub{display:flex;gap:20px;margin-top:10px;}
+.saldo-sub-item label{font-size:10px;display:block;}
+.saldo-sub-item span{font-size:13px;font-weight:700;}
+
+/* FORM */
+.form-row{display:flex;gap:8px;margin-bottom:9px;}
+.inp{
+  width:100%;padding:10px 12px;border-radius:10px;
+  background:var(--surface2);border:1px solid var(--subtle);
+  color:var(--text);font-size:13px;outline:none;
+  font-family:'DM Sans',sans-serif;
+}
+.inp::placeholder{color:var(--muted);}
+.tipo-row{display:flex;gap:8px;margin-bottom:9px;}
+.tipo-btn{
+  flex:1;padding:8px;border-radius:9px;border:none;
+  background:var(--surface2);color:var(--muted);
+  font-size:12px;font-weight:600;cursor:pointer;
+  font-family:'DM Sans',sans-serif;transition:all .15s;
+}
+.tipo-btn.e.active{background:#16a34a;color:#fff;}
+.tipo-btn.u.active{background:#dc2626;color:#fff;}
+.add-btn{
+  width:100%;padding:10px;border-radius:10px;border:none;
+  background:linear-gradient(135deg,var(--accent),#7c3aed);
+  color:#fff;font-size:13px;font-weight:700;cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+}
+
+/* FIN LIST */
+.fin-row{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:11px;padding:11px 13px;margin-bottom:8px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.fin-cat{font-size:13px;color:var(--text);}
+.fin-date{font-size:10px;color:var(--muted);}
+.fin-amt{font-size:15px;font-weight:700;}
+
+/* OBIETTIVI */
+.ob-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;margin-bottom:11px;}
+.ob-title{font-size:14px;font-weight:600;flex:1;}
+.ob-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.ob-del{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 2px;}
+.ob-prog{height:5px;background:var(--surface2);border-radius:99px;margin-bottom:8px;}
+.ob-prog-fill{height:100%;border-radius:99px;transition:width .3s;}
+.ob-bot{display:flex;justify-content:space-between;align-items:center;}
+.ob-info{font-size:11px;color:var(--muted);}
+.ob-ctrls{display:flex;gap:6px;}
+.ob-ctrl{
+  width:30px;height:30px;border-radius:7px;border:none;
+  background:var(--surface2);color:var(--text);font-size:16px;
+  cursor:pointer;font-weight:700;font-family:'DM Sans',sans-serif;
+}
+
+/* PROGRESS BAR */
+.prog-row{margin-bottom:10px;}
+.prog-header{display:flex;justify-content:space-between;margin-bottom:4px;}
+.prog-name{font-size:12px;color:#94a3b8;}
+.prog-val{font-size:12px;font-weight:700;}
+.prog-bar{height:4px;background:var(--surface2);border-radius:99px;}
+.prog-fill{height:100%;border-radius:99px;}
+
+/* EMPTY */
+.empty{text-align:center;color:var(--muted);padding:40px 20px;}
+.empty-icon{font-size:36px;margin-bottom:10px;}
+
+/* SECTION TITLE */
+.section-title{font-size:11px;color:var(--muted);margin-bottom:10px;letter-spacing:.5px;text-transform:uppercase;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="header-icon">✨</span>
+  <div>
+    <div class="header-title">Metodo FELICE</div>
+    <div class="header-sub">Il tuo equilibrio quotidiano</div>
+  </div>
+</div>
+
+<!-- TAB: OGGI -->
+<div id="tab-oggi" class="tab active">
+  <div class="score-wrap">
+    <div class="score-ring" id="scoreRing">
+      <div class="score-num" id="scoreNum">--</div>
+      <div class="score-label" id="scoreLabel">Calcola</div>
+      <div class="score-sub">Indice FELICE</div>
+    </div>
+  </div>
+
+  <div class="slider-row">
+    <div class="slider-header">
+      <span class="slider-name">😴 Sonno <span style="font-size:10px;color:var(--muted)">(30%)</span></span>
+      <span class="slider-val" id="vSonno" style="color:#818cf8">7</span>
+    </div>
+    <div class="slider-track"><div class="slider-fill" id="fSonno" style="background:#818cf8;width:66%"></div></div>
+    <input type="range" min="1" max="10" value="7" oninput="updateSlider('sonno',this.value)">
+  </div>
+
+  <div class="slider-row">
+    <div class="slider-header">
+      <span class="slider-name">⚡ Energia <span style="font-size:10px;color:var(--muted)">(25%)</span></span>
+      <span class="slider-val" id="vEnergia" style="color:#facc15">7</span>
+    </div>
+    <div class="slider-track"><div class="slider-fill" id="fEnergia" style="background:#facc15;width:66%"></div></div>
+    <input type="range" min="1" max="10" value="7" oninput="updateSlider('energia',this.value)">
+  </div>
+
+  <div class="slider-row">
+    <div class="slider-header">
+      <span class="slider-name">😊 Umore <span style="font-size:10px;color:var(--muted)">(20%)</span></span>
+      <span class="slider-val" id="vUmore" style="color:#4ade80">7</span>
+    </div>
+    <div class="slider-track"><div class="slider-fill" id="fUmore" style="background:#4ade80;width:66%"></div></div>
+    <input type="range" min="1" max="10" value="7" oninput="updateSlider('umore',this.value)">
+  </div>
+
+  <div class="slider-row">
+    <div class="slider-header">
+      <span class="slider-name">😰 Stress <span style="font-size:10px;color:var(--muted)">(10% inv.)</span></span>
+      <span class="slider-val" id="vStress" style="color:#f87171">3</span>
+    </div>
+    <div class="slider-track"><div class="slider-fill" id="fStress" style="background:#f87171;width:22%"></div></div>
+    <input type="range" min="1" max="10" value="3" oninput="updateSlider('stress',this.value)">
+  </div>
+
+  <div class="slider-row">
+    <div class="slider-header">
+      <span class="slider-name">🌱 Crescita <span style="font-size:10px;color:var(--muted)">(15%)</span></span>
+      <span class="slider-val" id="vCrescita" style="color:#34d399">7</span>
+    </div>
+    <div class="slider-track"><div class="slider-fill" id="fCrescita" style="background:#34d399;width:66%"></div></div>
+    <input type="range" min="1" max="10" value="7" oninput="updateSlider('crescita',this.value)">
+  </div>
+
+  <div style="margin-bottom:20px;">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">🏋️ Allenamento</div>
+    <div class="all-grid">
+      <button class="all-btn active" onclick="setAll('Nessuno',this)">Nessuno</button>
+      <button class="all-btn" onclick="setAll('Leggero',this)">Leggero</button>
+      <button class="all-btn" onclick="setAll('Moderato',this)">Moderato</button>
+      <button class="all-btn" onclick="setAll('Intenso',this)">Intenso</button>
+    </div>
+  </div>
+
+  <div class="card radar-wrap">
+    <div class="section-title">Profilo del giorno</div>
+    <canvas id="radarCanvas" width="280" height="200"></canvas>
+  </div>
+
+  <button class="save-btn" id="saveBtn" onclick="saveToday()">📝 Registra nel Diario</button>
+</div>
+
+<!-- TAB: DIARIO -->
+<div id="tab-diario" class="tab">
+  <div class="card" id="chartWrap" style="display:none">
+    <div class="section-title">Ultimi 7 giorni</div>
+    <div class="bar-row" id="barChart"></div>
+  </div>
+  <div id="diarioList"></div>
+</div>
+
+<!-- TAB: FINANZE -->
+<div id="tab-finanze" class="tab">
+  <div class="saldo-card">
+    <div class="saldo-lbl">Saldo</div>
+    <div class="saldo-val" id="saldoVal">€0,00</div>
+    <div class="saldo-sub">
+      <div class="saldo-sub-item"><label style="color:#4ade80">↑ Entrate</label><span id="totEnt" style="color:#4ade80">€0,00</span></div>
+      <div class="saldo-sub-item"><label style="color:#f87171">↓ Uscite</label><span id="totUsc" style="color:#f87171">€0,00</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="section-title">+ Nuova voce</div>
+    <div class="tipo-row">
+      <button class="tipo-btn e active" id="tipoE" onclick="setTipo('Entrata')">Entrata</button>
+      <button class="tipo-btn u" id="tipoU" onclick="setTipo('Uscita')">Uscita</button>
+    </div>
+    <input class="inp" id="finCat" placeholder="Categoria (es. Stipendio)"/>
+    <div style="height:8px"></div>
+    <input class="inp" id="finAmt" type="number" placeholder="Importo (€)"/>
+    <div style="height:8px"></div>
+    <button class="add-btn" onclick="addFin()">Aggiungi</button>
+  </div>
+  <div id="finList"></div>
+</div>
+
+<!-- TAB: OBIETTIVI -->
+<div id="tab-obiettivi" class="tab">
+  <div class="card">
+    <div class="section-title">+ Nuovo obiettivo</div>
+    <input class="inp" id="obName" placeholder="Obiettivo (es. Leggere 12 libri)"/>
+    <div style="height:8px"></div>
+    <div class="form-row">
+      <input class="inp" id="obTarget" type="number" placeholder="Target"/>
+      <input class="inp" id="obAtt" type="number" placeholder="Attuale"/>
+    </div>
+    <button class="add-btn" onclick="addOb()">Aggiungi</button>
+  </div>
+  <div id="obList"></div>
+</div>
+
+<!-- TAB: DASHBOARD -->
+<div id="tab-dashboard" class="tab">
+  <div class="kpi-grid" id="kpiGrid"></div>
+  <div class="card" id="dash7Wrap" style="display:none">
+    <div class="section-title">Ultimi 7 giorni</div>
+    <div class="bar-row" id="dash7Chart"></div>
+  </div>
+  <div class="card" id="dashMedieWrap" style="display:none">
+    <div class="section-title">Medie parametri</div>
+    <div id="dashMedie"></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="switchTab('oggi',this)"><span>📱</span><span>Oggi</span></button>
+  <button class="nav-btn" onclick="switchTab('diario',this)"><span>📊</span><span>Diario</span></button>
+  <button class="nav-btn" onclick="switchTab('finanze',this)"><span>💶</span><span>Finanze</span></button>
+  <button class="nav-btn" onclick="switchTab('obiettivi',this)"><span>🏆</span><span>Obiettivi</span></button>
+  <button class="nav-btn" onclick="switchTab('dashboard',this)"><span>🎯</span><span>Dashboard</span></button>
+</nav>
+
+<script>
+// ── STATE ──
+const STORAGE_KEY = 'felice_v2';
+let state = { diario:[], finanze:[], obiettivi:[] };
+try{ const r=localStorage.getItem(STORAGE_KEY); if(r) state=JSON.parse(r); }catch(e){}
+
+let form = { sonno:7, energia:7, umore:7, stress:3, crescita:7, allenamento:'Nessuno' };
+let finTipo = 'Entrata';
+
+function save(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
+
+// ── SCORE ──
+function calcScore(f){
+  const si = 11 - f.stress;
+  return Math.round((f.sonno*.30 + f.energia*.25 + f.umore*.20 + f.crescita*.15 + si*.10)*10);
+}
+
+function getInfo(s){
+  if(s>=80) return {label:'Eccellente',color:'#4ade80'};
+  if(s>=60) return {label:'Buono',color:'#facc15'};
+  if(s>=40) return {label:'Instabile',color:'#fb923c'};
+  return {label:'Critico',color:'#f87171'};
+}
+
+function fmtDate(d){ return new Date(d).toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit'}); }
+function fmtDateLong(d){ return new Date(d).toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'short'}); }
+function fmtEur(n){ return '€'+n.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function todayStr(){ return new Date().toISOString().split('T')[0]; }
+
+// ── SLIDERS ──
+function updateSlider(key, val){
+  form[key] = +val;
+  document.getElementById('v'+cap(key)).textContent = val;
+  const pct = (val-1)/9*100;
+  document.getElementById('f'+cap(key)).style.width = pct+'%';
+  refreshScore();
+  drawRadar();
+}
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+function setAll(val, btn){
+  form.allenamento = val;
+  document.querySelectorAll('.all-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function refreshScore(){
+  const s = calcScore(form);
+  const {label,color} = getInfo(s);
+  document.getElementById('scoreNum').textContent = s;
+  document.getElementById('scoreNum').style.color = color;
+  document.getElementById('scoreLabel').textContent = label;
+  document.getElementById('scoreLabel').style.color = color;
+  const ring = document.getElementById('scoreRing');
+  ring.style.borderColor = color+'44';
+  ring.style.boxShadow = '0 0 40px '+color+'22';
+  ring.style.border = '2px solid '+color+'44';
+}
+
+// ── RADAR ──
+function drawRadar(){
+  const canvas = document.getElementById('radarCanvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height, cx=W/2, cy=H/2, r=Math.min(W,H)/2-30;
+  ctx.clearRect(0,0,W,H);
+
+  const labels = ['Sonno','Energia','Umore','Crescita','Stress inv.'];
+  const vals = [
+    (form.sonno-1)/9,
+    (form.energia-1)/9,
+    (form.umore-1)/9,
+    (form.crescita-1)/9,
+    (11-form.stress-1)/9,
+  ];
+  const n = labels.length;
+  const angleOffset = -Math.PI/2;
+
+  // Grid
+  [.25,.5,.75,1].forEach(frac=>{
+    ctx.beginPath();
+    for(let i=0;i<n;i++){
+      const a = angleOffset + (i/n)*Math.PI*2;
+      const x = cx + Math.cos(a)*r*frac;
+      const y = cy + Math.sin(a)*r*frac;
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle='#1e2240';
+    ctx.lineWidth=1;
+    ctx.stroke();
+  });
+
+  // Axes
+  for(let i=0;i<n;i++){
+    const a = angleOffset + (i/n)*Math.PI*2;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+Math.cos(a)*r, cy+Math.sin(a)*r);
+    ctx.strokeStyle='#1e2240';
+    ctx.lineWidth=1;
+    ctx.stroke();
+  }
+
+  // Data
+  ctx.beginPath();
+  vals.forEach((v,i)=>{
+    const a = angleOffset + (i/n)*Math.PI*2;
+    const x = cx + Math.cos(a)*r*v;
+    const y = cy + Math.sin(a)*r*v;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.closePath();
+  ctx.fillStyle='#6366f133';
+  ctx.fill();
+  ctx.strokeStyle='#6366f1';
+  ctx.lineWidth=2;
+  ctx.stroke();
+
+  // Labels
+  ctx.font='10px DM Sans,sans-serif';
+  ctx.fillStyle='#64748b';
+  ctx.textAlign='center';
+  labels.forEach((lbl,i)=>{
+    const a = angleOffset + (i/n)*Math.PI*2;
+    const lx = cx + Math.cos(a)*(r+16);
+    const ly = cy + Math.sin(a)*(r+16);
+    ctx.fillText(lbl,lx,ly+3);
+  });
+}
+
+// ── SAVE TODAY ──
+function saveToday(){
+  const today = todayStr();
+  if(state.diario.some(r=>r.data===today)) return;
+  const s = calcScore(form);
+  state.diario.unshift({data:today,...JSON.parse(JSON.stringify(form)),indice:s});
+  save();
+  const btn = document.getElementById('saveBtn');
+  btn.textContent='✅ Salvato!';
+  btn.classList.add('saved');
+  btn.disabled=true;
+  setTimeout(()=>{ checkSaved(); },2000);
+  renderDiario();
+  renderDashboard();
+}
+
+function checkSaved(){
+  const btn = document.getElementById('saveBtn');
+  const today = todayStr();
+  if(state.diario.some(r=>r.data===today)){
+    btn.textContent='✓ Già registrato oggi';
+    btn.classList.remove('saved');
+    btn.disabled=true;
+  } else {
+    btn.textContent='📝 Registra nel Diario';
+    btn.classList.remove('saved');
+    btn.disabled=false;
+  }
+}
+
+// ── DIARIO ──
+function renderDiario(){
+  const list = document.getElementById('diarioList');
+  const chartWrap = document.getElementById('chartWrap');
+  const barChart = document.getElementById('barChart');
+
+  if(state.diario.length===0){
+    list.innerHTML='<div class="empty"><div class="empty-icon">📭</div>Nessun dato ancora.<br>Compila il check-in in "Oggi"!</div>';
+    chartWrap.style.display='none';
+    return;
+  }
+
+  // Bar chart last 7
+  const last7 = state.diario.slice(0,7).reverse();
+  chartWrap.style.display='block';
+  barChart.innerHTML = last7.map(r=>{
+    const {color}=getInfo(r.indice);
+    const h = Math.round((r.indice/100)*70);
+    return `<div class="bar-col">
+      <span class="bar-val" style="color:${color}">${r.indice}</span>
+      <div class="bar-body" style="height:${h}px;background:${color};opacity:.85"></div>
+      <span class="bar-date">${fmtDate(r.data)}</span>
+    </div>`;
+  }).join('');
+
+  list.innerHTML = state.diario.map(r=>{
+    const {label,color}=getInfo(r.indice);
+    return `<div class="diary-row">
+      <div>
+        <div class="diary-date">${fmtDateLong(r.data)}</div>
+        <div class="diary-params">😴${r.sonno} ⚡${r.energia} 😊${r.umore} 😰${r.stress} 🌱${r.crescita}${r.allenamento!=='Nessuno'?' 🏋️'+r.allenamento:''}</div>
+      </div>
+      <div>
+        <div class="diary-score" style="color:${color}">${r.indice}</div>
+        <div class="diary-badge" style="color:${color}">${label}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── FINANZE ──
+function setTipo(t){
+  finTipo=t;
+  document.getElementById('tipoE').classList.toggle('active',t==='Entrata');
+  document.getElementById('tipoU').classList.toggle('active',t==='Uscita');
+}
+
+function addFin(){
+  const cat=document.getElementById('finCat').value.trim();
+  const amt=parseFloat(document.getElementById('finAmt').value);
+  if(!cat||isNaN(amt)||amt<=0) return;
+  state.finanze.unshift({data:todayStr(),tipo:finTipo,categoria:cat,importo:amt});
+  save();
+  document.getElementById('finCat').value='';
+  document.getElementById('finAmt').value='';
+  renderFinanze();
+}
+
+function renderFinanze(){
+  const ent=state.finanze.filter(f=>f.tipo==='Entrata').reduce((s,f)=>s+f.importo,0);
+  const usc=state.finanze.filter(f=>f.tipo==='Uscita').reduce((s,f)=>s+f.importo,0);
+  document.getElementById('totEnt').textContent=fmtEur(ent);
+  document.getElementById('totUsc').textContent=fmtEur(usc);
+  document.getElementById('saldoVal').textContent=fmtEur(ent-usc);
+
+  const list=document.getElementById('finList');
+  if(state.finanze.length===0){
+    list.innerHTML='<div class="empty"><div class="empty-icon">💶</div>Nessuna voce ancora.</div>';
+    return;
+  }
+  list.innerHTML=state.finanze.map(f=>`
+    <div class="fin-row">
+      <div><div class="fin-cat">${f.categoria}</div><div class="fin-date">${fmtDate(f.data)}</div></div>
+      <div class="fin-amt" style="color:${f.tipo==='Entrata'?'#4ade80':'#f87171'}">${f.tipo==='Entrata'?'+':'-'}${fmtEur(f.importo)}</div>
+    </div>`).join('');
+}
+
+// ── OBIETTIVI ──
+function addOb(){
+  const nome=document.getElementById('obName').value.trim();
+  const target=+document.getElementById('obTarget').value;
+  const att=+document.getElementById('obAtt').value||0;
+  if(!nome||!target) return;
+  state.obiettivi.push({obiettivo:nome,target,attuale:Math.min(att,target)});
+  save();
+  document.getElementById('obName').value='';
+  document.getElementById('obTarget').value='';
+  document.getElementById('obAtt').value='';
+  renderObiettivi();
+}
+
+function updateOb(i,delta){
+  const ob=state.obiettivi[i];
+  ob.attuale=Math.max(0,Math.min(ob.target,ob.attuale+delta));
+  save();
+  renderObiettivi();
+  renderDashboard();
+}
+
+function deleteOb(i){
+  state.obiettivi.splice(i,1);
+  save();
+  renderObiettivi();
+  renderDashboard();
+}
+
+function renderObiettivi(){
+  const list=document.getElementById('obList');
+  if(state.obiettivi.length===0){
+    list.innerHTML='<div class="empty"><div class="empty-icon">🎯</div>Nessun obiettivo ancora.</div>';
+    return;
+  }
+  list.innerHTML=state.obiettivi.map((ob,i)=>{
+    const pct=Math.min(100,Math.round(ob.attuale/ob.target*100));
+    const color=pct===100?'#4ade80':'#6366f1';
+    return `<div class="ob-card">
+      <div class="ob-top">
+        <div class="ob-title">${ob.obiettivo}</div>
+        <button class="ob-del" onclick="deleteOb(${i})">×</button>
+      </div>
+      <div class="ob-prog"><div class="ob-prog-fill" style="width:${pct}%;background:${color}"></div></div>
+      <div class="ob-bot">
+        <div class="ob-info">${ob.attuale} / ${ob.target} — ${pct}%</div>
+        <div class="ob-ctrls">
+          <button class="ob-ctrl" onclick="updateOb(${i},-1)" ${ob.attuale<=0?'disabled':''}>−</button>
+          <button class="ob-ctrl" onclick="updateOb(${i},1)" ${ob.attuale>=ob.target?'disabled':''}>+</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── DASHBOARD ──
+function renderDashboard(){
+  const d=state.diario;
+  const avg=d.length?Math.round(d.reduce((s,r)=>s+r.indice,0)/d.length):0;
+  const ent=state.finanze.filter(f=>f.tipo==='Entrata').reduce((s,f)=>s+f.importo,0);
+  const usc=state.finanze.filter(f=>f.tipo==='Uscita').reduce((s,f)=>s+f.importo,0);
+  const {color}=getInfo(avg);
+
+  document.getElementById('kpiGrid').innerHTML=[
+    {emoji:'📊',val:avg||'—',color,lbl:'Media FELICE'},
+    {emoji:'📅',val:d.length,color:'#818cf8',lbl:'Giorni registrati'},
+    {emoji:'💶',val:fmtEur(ent-usc),color:'#4ade80',lbl:'Saldo'},
+    {emoji:'🏆',val:state.obiettivi.length,color:'#facc15',lbl:'Obiettivi'},
+  ].map(k=>`<div class="kpi-card">
+    <div class="kpi-emoji">${k.emoji}</div>
+    <div class="kpi-val" style="color:${k.color}">${k.val}</div>
+    <div class="kpi-lbl">${k.lbl}</div>
+  </div>`).join('');
+
+  // Bar 7
+  const wrap7=document.getElementById('dash7Wrap');
+  const bar7=document.getElementById('dash7Chart');
+  if(d.length>0){
+    wrap7.style.display='block';
+    const last7=d.slice(0,7).reverse();
+    bar7.innerHTML=last7.map(r=>{
+      const {color}=getInfo(r.indice);
+      const h=Math.round((r.indice/100)*70);
+      return `<div class="bar-col">
+        <span class="bar-val" style="color:${color}">${r.indice}</span>
+        <div class="bar-body" style="height:${h}px;background:${color};opacity:.85"></div>
+        <span class="bar-date">${fmtDate(r.data)}</span>
+      </div>`;
+    }).join('');
+  } else { wrap7.style.display='none'; }
+
+  // Medie
+  const mWrap=document.getElementById('dashMedieWrap');
+  const mDiv=document.getElementById('dashMedie');
+  if(d.length>0){
+    mWrap.style.display='block';
+    const sliders=[
+      {key:'sonno',emoji:'😴',label:'Sonno',color:'#818cf8'},
+      {key:'energia',emoji:'⚡',label:'Energia',color:'#facc15'},
+      {key:'umore',emoji:'😊',label:'Umore',color:'#4ade80'},
+      {key:'stress',emoji:'😰',label:'Stress',color:'#f87171'},
+      {key:'crescita',emoji:'🌱',label:'Crescita',color:'#34d399'},
+    ];
+    mDiv.innerHTML=sliders.map(s=>{
+      const avg=(d.reduce((sum,r)=>sum+r[s.key],0)/d.length).toFixed(1);
+      const pct=((avg-1)/9*100).toFixed(0);
+      return `<div class="prog-row">
+        <div class="prog-header">
+          <span class="prog-name">${s.emoji} ${s.label}</span>
+          <span class="prog-val" style="color:${s.color}">${avg}</span>
+        </div>
+        <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${s.color}"></div></div>
+      </div>`;
+    }).join('');
+  } else { mWrap.style.display='none'; }
+}
+
+// ── TABS ──
+function switchTab(id, btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='diario') renderDiario();
+  if(id==='finanze') renderFinanze();
+  if(id==='obiettivi') renderObiettivi();
+  if(id==='dashboard') renderDashboard();
+}
+
+// ── INIT ──
+refreshScore();
+drawRadar();
+checkSaved();
+renderDashboard();
+</script>
+</body>
+</html>
